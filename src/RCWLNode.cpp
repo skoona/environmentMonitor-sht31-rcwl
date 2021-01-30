@@ -1,0 +1,70 @@
+/**
+ * Homie Node for RCWL-0516 Doppler Radar Microwave Motion Sensor
+ * 
+ */
+#include "RCWLNode.hpp"
+
+RCWLNode::RCWLNode(const uint8_t rcwlPin, const char *id, const char *name, const char *nType, const int motionHoldInterval = HOLD_INTERVAL)
+    : HomieNode(id, name, nType, false, 0U, 0U)
+{
+  _motionHoldInterval = (motionHoldInterval > MIN_INTERVAL) ? motionHoldInterval : MIN_INTERVAL;
+  _motionPin = rcwlPin;
+
+  // Start up the library
+  pinMode(_motionPin, INPUT); 
+}
+
+/**
+ * Called by Homie when Homie.setup() is called; Once!
+*/
+void RCWLNode::setup() {
+  Homie.getLogger() << cCaption << endl;
+  Homie.getLogger() << cIndent << cPropertyName << endl;
+
+  advertise(cProperty)
+      .setName(cPropertyName)
+      .setDatatype("string")
+      .setUnit(cPropertyUnit);
+}
+
+/**
+ * Called by Homie when homie is connected and in run mode
+*/
+void RCWLNode::loop() {
+  _isrTrigger = digitalRead(_motionPin);
+
+  if (_isrTrigger == HIGH) {
+    _isrTriggeredAt = millis(); // push hold time
+    _lastMotion = true;
+
+    if (_lastMotion && !_motion )
+    {
+      _motion = true;
+
+      Homie.getLogger() << F("〽 Sending Presence: ") << endl;
+
+      Homie.getLogger() << cIndent
+                        << F("✖ Motion Detected: ON ")
+                        << endl;
+
+      setProperty(cProperty).setRetained(true).send("ON");
+    }
+  }
+
+  if (_isrTriggeredAt != 0 ) {
+    if (_motion && (millis() - _isrTriggeredAt >= _motionHoldInterval * 1000UL)) {
+      // hold time expired
+
+      _lastMotion = false;
+      _motion = false;          // re-enable motion
+      _isrTriggeredAt = 0;
+
+      Homie.getLogger() << cIndent
+                        << F("✖ Motion Detected: OFF ")
+                        << endl;
+
+      setProperty(cProperty).setRetained(true).send("OFF");
+    }
+  }
+}
+
