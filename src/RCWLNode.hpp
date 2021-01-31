@@ -23,8 +23,6 @@ protected:
   void loop() override;
   
 private:
-  int _motionPin = 0;
-
   // suggested rate is 1/60Hz (1m)
   static const int MIN_INTERVAL  = 10;  // in seconds
   static const int HOLD_INTERVAL = 60;
@@ -32,15 +30,18 @@ private:
   const char *cCaption = "• RCWL-0516 Doppler Radar Microwave Motion Sensor:";
   const char* cIndent  = "  ◦ ";
 
-  const char *cProperty     = "presence";
-  const char *cPropertyName = "Presence";
-  const char *cPropertyUnit = "%";
+  // Motion Node Properties
+  int _motionPin = 0;
+  const char *cProperty = "motion";
+  const char *cPropertyName = "Motion";
+  const char *cPropertyDataType = "string";
+  const char *cPropertyFormat = "Open,Closed";
+  const char *cPropertyUnit = "";
 
   unsigned long _motionHoldInterval;
   
   // RCWL-0516 Sensors address
-  volatile bool _motion = false,
-                _lastMotion = true;
+  volatile bool _motion = false;
   volatile byte _isrTrigger = LOW;
   volatile unsigned long _isrTriggeredAt = 0L;
  

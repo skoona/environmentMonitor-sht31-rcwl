@@ -9,6 +9,7 @@ RCWLNode::RCWLNode(const uint8_t rcwlPin, const char *id, const char *name, cons
 {
   _motionHoldInterval = (motionHoldInterval > MIN_INTERVAL) ? motionHoldInterval : MIN_INTERVAL;
   _motionPin = rcwlPin;
+  _motion = false;
 
   // Start up the library
   pinMode(_motionPin, INPUT); 
@@ -23,8 +24,9 @@ void RCWLNode::setup() {
 
   advertise(cProperty)
       .setName(cPropertyName)
-      .setDatatype("string")
-      .setUnit(cPropertyUnit);
+      .setDatatype(cPropertyDataType)
+      .setFormat(cPropertyFormat);
+      // .setUnit(cPropertyUnit);
 }
 
 /**
@@ -35,9 +37,8 @@ void RCWLNode::loop() {
 
   if (_isrTrigger == HIGH) {
     _isrTriggeredAt = millis(); // push hold time
-    _lastMotion = true;
 
-    if (_lastMotion && !_motion )
+    if (!_motion)
     {
       _motion = true;
 
@@ -47,7 +48,7 @@ void RCWLNode::loop() {
                         << F("✖ Motion Detected: ON ")
                         << endl;
 
-      setProperty(cProperty).setRetained(true).send("ON");
+      setProperty(cProperty).setRetained(true).send("Open");
     }
   }
 
@@ -55,7 +56,6 @@ void RCWLNode::loop() {
     if (_motion && (millis() - _isrTriggeredAt >= _motionHoldInterval * 1000UL)) {
       // hold time expired
 
-      _lastMotion = false;
       _motion = false;          // re-enable motion
       _isrTriggeredAt = 0;
 
@@ -63,7 +63,7 @@ void RCWLNode::loop() {
                         << F("✖ Motion Detected: OFF ")
                         << endl;
 
-      setProperty(cProperty).setRetained(true).send("OFF");
+      setProperty(cProperty).setRetained(true).send("Closed");
     }
   }
 }

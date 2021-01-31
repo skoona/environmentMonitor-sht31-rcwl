@@ -32,11 +32,11 @@ extern "C"
 #define SKN_TNODE_TITLE "SHT31 Temperature and Humidity Sensor"
 #define SKN_MNODE_TITLE "RCWL-0516 Motion Sensor"
 
-#define SKN_TNODE_TYPE "temperature"
-#define SKN_MNODE_TYPE "motion"
+#define SKN_TNODE_TYPE "sensor"
+#define SKN_MNODE_TYPE "sensor"
 
-#define SKN_TNODE_ID "SHT31"    
-#define SKN_MNODE_ID "RCWL0516" 
+#define SKN_TNODE_ID "ambient"    
+#define SKN_MNODE_ID "presence" 
 
 // Select SDA and SCL pins for I2C communication and Motion
 #define PIN_RCWL D5 // 14
