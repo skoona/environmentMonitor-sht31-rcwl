@@ -34,8 +34,8 @@ private:
   int _motionPin = 0;
   const char *cProperty = "motion";
   const char *cPropertyName = "Motion";
-  const char *cPropertyDataType = "string";
-  const char *cPropertyFormat = "Open,Closed";
+  const char *cPropertyDataType = "enum";
+  const char *cPropertyFormat = "OPEN,CLOSED";
   const char *cPropertyUnit = "";
 
   unsigned long _motionHoldInterval;

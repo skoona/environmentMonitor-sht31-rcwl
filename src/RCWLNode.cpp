@@ -48,7 +48,7 @@ void RCWLNode::loop() {
                         << F("✖ Motion Detected: ON ")
                         << endl;
 
-      setProperty(cProperty).setRetained(true).send("Open");
+      setProperty(cProperty).setRetained(true).send("OPEN");
     }
   }
 
@@ -63,7 +63,7 @@ void RCWLNode::loop() {
                         << F("✖ Motion Detected: OFF ")
                         << endl;
 
-      setProperty(cProperty).setRetained(true).send("Closed");
+      setProperty(cProperty).setRetained(true).send("CLOSED");
     }
   }
 }

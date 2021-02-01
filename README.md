@@ -70,8 +70,8 @@ sknSensors/LocationName/presence/$name RCWL-0516 Motion Sensor
 sknSensors/LocationName/presence/$type sensor
 sknSensors/LocationName/presence/$properties motion
 sknSensors/LocationName/presence/motion/$name Motion
-sknSensors/LocationName/presence/motion/$datatype string
-sknSensors/LocationName/presence/motion/$format Open,Closed
+sknSensors/LocationName/presence/motion/$datatype enum
+sknSensors/LocationName/presence/motion/$format OPEN,ClOSED
 
 sknSensors/LocationName/$state ready
 sknSensors/LocationName/ambient/temperature 56.98

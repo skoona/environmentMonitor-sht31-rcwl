@@ -35,8 +35,8 @@ extern "C"
 #define SKN_TNODE_TYPE "sensor"
 #define SKN_MNODE_TYPE "sensor"
 
-#define SKN_TNODE_ID "ambient"    
-#define SKN_MNODE_ID "presence" 
+#define SKN_TNODE_ID "Ambient"    
+#define SKN_MNODE_ID "Presence" 
 
 // Select SDA and SCL pins for I2C communication and Motion
 #define PIN_RCWL D5 // 14
