@@ -19,6 +19,8 @@ public:
   float getTemperatureF() const { return (_sensorResults.TemperatureF); }
   float getHumidity() const { return _sensorResults.Humidity; }
 
+  // ((event.temperature * 1.8) + 32.0)
+
 protected:
   void setup() override;
   void loop() override;

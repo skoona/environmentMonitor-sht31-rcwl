@@ -21,12 +21,12 @@ Sht31Node::Sht31Node(const uint8_t sdaPin, const uint8_t sclPin, const char *id,
   */
   void Sht31Node::setup() {
     Homie.getLogger() << cIndent << F("Sensor SerialNumber: ") << sensor->readSerialNumber() << endl;
-    Homie.getLogger() << cIndent << F("Sensor Heater Status: ") << (sensor->softReset() ? "Heater Off" : "Heater On") << endl;
+    // Homie.getLogger() << cIndent << F("Sensor Heater Status: ") << (sensor->softReset() ? "Heater Off" : "Heater On") << endl;
 
     advertise(cHumidity)
-        .setName(cHumidityName)
-        .setDatatype("float")
-        .setUnit(cHumidityUnit);
+      .setName(cHumidityName)
+      .setDatatype("float")
+      .setUnit(cHumidityUnit);
 
     advertise(cTemperature)
       .setName(cTemperatureName)
@@ -53,8 +53,8 @@ Sht31Node::Sht31Node(const uint8_t sdaPin, const uint8_t sclPin, const char *id,
                         << F(", Humidity=")
                         << getHumidity()
                         << endl;
-      setProperty(cTemperature).send(String( getTemperatureF() ));
-      setProperty(cHumidity).send(String( getHumidity() ));
+      setProperty(cTemperature).setRetained(true).send(String( getTemperatureF() ));
+      setProperty(cHumidity).setRetained(true).send(String(getHumidity()));
     }
     else
     {
@@ -63,6 +63,7 @@ Sht31Node::Sht31Node(const uint8_t sdaPin, const uint8_t sclPin, const char *id,
                         << _sensorResults.ERR
                         << ", value (F) read=" << _sensorResults.TemperatureF
                         << endl;
+      setProperty("$state").setRetained(true).send("alert");
     }
   }
 
