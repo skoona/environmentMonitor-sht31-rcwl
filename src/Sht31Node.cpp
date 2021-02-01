@@ -12,16 +12,16 @@ Sht31Node::Sht31Node(const uint8_t sdaPin, const uint8_t sclPin, const char *id,
 
   // Start up the library
   Wire.begin(sdaPin, sclPin);
-  sensor = new DFRobot_SHT3x(&Wire, _sensorAddress);
-  sensor->begin();
+  sensor = new SHT31();
+  sensor->begin(_sensorAddress, &Wire);
 }
 
   /**
     * Called by Homie when Homie.setup() is called; Once!
   */
   void Sht31Node::setup() {
-    Homie.getLogger() << cIndent << F("Sensor SerialNumber: ") << sensor->readSerialNumber() << endl;
-    // Homie.getLogger() << cIndent << F("Sensor Heater Status: ") << (sensor->softReset() ? "Heater Off" : "Heater On") << endl;
+    Homie.getLogger() << cIndent << F("Sensor Connection: ") << sensor->isConnected() << endl;
+    Homie.getLogger() << cIndent << F("Sensor Heater Status: ") << (sensor->isHeaterOn() ? "Heater On" : "Heater Off") << endl;
 
     advertise(cHumidity)
       .setName(cHumidityName)
@@ -45,13 +45,14 @@ Sht31Node::Sht31Node(const uint8_t sdaPin, const uint8_t sclPin, const char *id,
 
     Homie.getLogger() << F("〽 Sending Temperature: ") << getId() << endl;
     
-    _sensorResults = sensor->readTemperatureAndHumidity(sensor->eRepeatability_High);
-    if (_sensorResults.ERR == ERR_OK) {
+    if (sensor->read(true)) {
+      _temperature = sensor->getTemperature();
+      _humidity = sensor->getHumidity();
       Homie.getLogger() << cIndent
                         << F("Temperature=")
                         << getTemperatureF()
                         << F(", Humidity=")
-                        << getHumidity()
+                        << _humidity
                         << endl;
       setProperty(cTemperature).setRetained(true).send(String( getTemperatureF() ));
       setProperty(cHumidity).setRetained(true).send(String(getHumidity()));
@@ -60,8 +61,8 @@ Sht31Node::Sht31Node(const uint8_t sdaPin, const uint8_t sclPin, const char *id,
     {
       Homie.getLogger() << cIndent
                         << F("✖ Error reading sensor: ")
-                        << _sensorResults.ERR
-                        << ", value (F) read=" << _sensorResults.TemperatureF
+                        << sensor->readStatus()
+                        << ", value (F) read=" << sensor->getTemperature()
                         << endl;
       setProperty("$state").setRetained(true).send("alert");
     }

@@ -7,7 +7,7 @@
 
 #include <Homie.hpp>
 #include <Wire.h>
-#include <DFRobot_SHT3x.h>
+#include <SHT31.h>
 
 class Sht31Node : public HomieNode {
 
@@ -16,10 +16,8 @@ public:
 
   void          setMeasurementInterval(unsigned long interval) { _measurementInterval = interval; }
   unsigned long getMeasurementInterval() const { return _measurementInterval; }
-  float getTemperatureF() const { return (_sensorResults.TemperatureF); }
-  float getHumidity() const { return _sensorResults.Humidity; }
-
-  // ((event.temperature * 1.8) + 32.0)
+  float getTemperatureF() const { return (((_temperature * 1.8) + 32.0)); }
+  float getHumidity() const { return _humidity; }
 
 protected:
   void setup() override;
@@ -47,6 +45,8 @@ private:
   unsigned long _measurementInterval;
   unsigned long _lastMeasurement;
 
-  DFRobot_SHT3x *sensor;
-  DFRobot_SHT3x::sRHAndTemp_t _sensorResults; // Sensor last temp/hum read
+  SHT31 *sensor;
+
+  float _temperature = NAN;
+  float _humidity = NAN;
 };
