@@ -12,6 +12,7 @@
 #include <Arduino.h>
 #include "Sht31Node.hpp"
 #include "RCWLNode.hpp"
+#include "MetricsNode.hpp"
 
 #ifdef ESP8266
 extern "C"
@@ -25,18 +26,22 @@ extern "C"
  * ex: sknSensors/deviceName/SHT31_0/temperature -> 72.3 degress
  * Note: HomieNode(...range,lower,upper) manages this array suffix change; i.e no more name fixups
 */
-#define SKN_MOD_NAME "Environment-SHT31-RCWL0516"
-#define SKN_MOD_VERSION "1.1.1"
+#define SKN_MOD_NAME "Monitor-SHT31-RCWL-Metrics"
+#define SKN_MOD_VERSION "2.0.0"
 #define SKN_MOD_BRAND "SknSensors"
 
-#define SKN_TNODE_TITLE "SHT31 Temperature and Humidity Sensor"
-#define SKN_MNODE_TITLE "RCWL-0516 Motion Sensor"
+#define SKN_TNODE_TITLE "Temperature and Humidity Sensor"
+#define SKN_MNODE_TITLE "Motion Sensor"
 
 #define SKN_TNODE_TYPE "sensor"
 #define SKN_MNODE_TYPE "sensor"
 
 #define SKN_TNODE_ID "Ambient"    
-#define SKN_MNODE_ID "Presence" 
+#define SKN_MNODE_ID "Presence"
+
+#define SKN_DNODE_TITLE "Device Info"
+#define SKN_DNODE_TYPE "sensor"
+#define SKN_DNODE_ID "hardware"
 
 // Select SDA and SCL pins for I2C communication and Motion
 #define PIN_RCWL D5 // 14
@@ -44,11 +49,14 @@ extern "C"
 #define PIN_SDA  D7 // 13
 #define SENSOR_READ_INTERVAL 300
 
+ADC_MODE(ADC_VCC); //vcc read in MetricsNode
+
 HomieSetting<long> sensorsIntervalSetting("sensorInterval", "The interval in seconds to wait between sending commands.");
 HomieSetting<long> motionIntervalSetting("motionHoldInterval", "The interval in seconds to hold motion detection.");
 
 Sht31Node temperatureMonitor(PIN_SDA, PIN_SCL, SKN_TNODE_ID, SKN_TNODE_TITLE, SKN_TNODE_TYPE, SENSOR_READ_INTERVAL);
 RCWLNode  motionMonitor(PIN_RCWL, SKN_MNODE_ID, SKN_MNODE_TITLE, SKN_MNODE_TYPE, SENSOR_READ_INTERVAL);
+MetricsNode metricsNode(SKN_DNODE_ID, SKN_DNODE_TITLE, SKN_DNODE_TYPE);
 
 bool broadcastHandler(const String &level, const String &value)
 {
@@ -74,6 +82,7 @@ void setup()
 
   temperatureMonitor.setMeasurementInterval(sensorsIntervalSetting.get());
   motionMonitor.setMotionHoldInterval(motionIntervalSetting.get());
+  metricsNode.setMeasurementInterval(60);
 
   Homie_setFirmware(SKN_MOD_NAME, SKN_MOD_VERSION);
   Homie_setBrand(SKN_MOD_BRAND);
